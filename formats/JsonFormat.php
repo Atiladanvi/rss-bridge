@@ -11,6 +11,7 @@ class JsonFormat extends FormatAbstract {
 	const VENDOR_EXCLUDES = array(
 		'author',
 		'title',
+		'description',
 		'uri',
 		'timestamp',
 		'content',
@@ -31,7 +32,8 @@ class JsonFormat extends FormatAbstract {
 			'version' => 'https://jsonfeed.org/version/1',
 			'title' => (!empty($extraInfos['name'])) ? $extraInfos['name'] : $urlHost,
 			'home_page_url' => (!empty($extraInfos['uri'])) ? $extraInfos['uri'] : REPOSITORY,
-			'feed_url' => $urlPrefix . $urlHost . $urlRequest
+			'feed_url' => $urlPrefix . $urlHost . $urlRequest,
+			'total' => count($this->getItems()),
 		);
 
 		if (!empty($extraInfos['icon'])) {
@@ -52,6 +54,9 @@ class JsonFormat extends FormatAbstract {
 			$entryCategories = $item->getCategories();
 
 			$vendorFields = $item->toArray();
+
+			$allFields = $item->toArray();
+
 			foreach (self::VENDOR_EXCLUDES as $key) {
 				unset($vendorFields[$key]);
 			}
@@ -77,12 +82,13 @@ class JsonFormat extends FormatAbstract {
 				$entry['url'] = $entryUri;
 			}
 			if (!empty($entryContent)) {
-				if ($this->isHTML($entryContent)) {
-					$entry['content_html'] = $entryContent;
-				} else {
-					$entry['content_text'] = $entryContent;
-				}
+                $entry['content'] = $entryContent;
 			}
+
+            if (!empty($allFields['description'])) {
+                $entry['description'] = $allFields['description'];
+            }
+
 			if (!empty($entryEnclosures)) {
 				$entry['attachments'] = array();
 				foreach ($entryEnclosures as $enclosure) {
@@ -98,9 +104,10 @@ class JsonFormat extends FormatAbstract {
 					$entry['tags'][] = $category;
 				}
 			}
-			if (!empty($vendorFields)) {
-				$entry['_rssbridge'] = $vendorFields;
-			}
+
+            if (!empty($vendorFields)) {
+                $entry['_rssbridge'] = $vendorFields;
+            }
 
 			if (empty($entry['id']))
 				$entry['id'] = hash('sha1', $entryTitle . $entryContent);
