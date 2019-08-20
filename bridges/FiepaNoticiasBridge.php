@@ -5,7 +5,7 @@ class FiepaNoticiasBridge extends BridgeAbstract {
 	const NAME = 'FiepaNoticiasBridge';
 	const URI = 'http://www.fiepa.org.br/noticias';
 	const CACHE_TIMEOUT = 100000;
-	const DESCRIPTION = 'Retorna todas as notícias do portal senac pa.';
+	const DESCRIPTION = 'Retorna todas as notícias do portal fiepa.';
 
 
 	public function collectData(){
